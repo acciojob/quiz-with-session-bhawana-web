@@ -3,18 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
+    <title>Quiz with Session</title>
+    <style>
+        .question {
+            margin-bottom: 20px;
+        }
+        .question label {
+            display: block;
+        }
+        .score {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div id="quiz-container">
-        <h1>Quiz</h1>
-        <form id="quiz-form">
-            <!-- Questions will be injected dynamically here -->
-        </form>
-        <button id="submit-btn" type="button">Submit Quiz</button>
-        <div id="score-container"></div>
-    </div>
 
-    <script src="quiz.js"></script>
+    <h1>Quiz: Test Your Knowledge</h1>
+
+    <div id="quizContainer"></div>
+
+    <button id="submitBtn">Submit</button>
+
+    <div class="score" id="scoreContainer"></div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Madrid", "Paris", "Rome"],
+                answer: 2 // Index of the correct answer
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Saturn"],
+                answer: 1
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                answer: 3
+            },
+            {
+                question: "Who wrote 'Romeo and Juliet'?",
+                options: ["Shakespeare", "Dickens", "Austen", "Hemingway"],
+                answer: 0
+            },
+            {
+                question: "What is the smallest country in the world?",
+                options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+                answer: 1
+            }
+        ];
+
+        // Function to load the quiz progress from session storage
+        function loadQuizProgress() {
+            const progress = JSON.parse(sessionStorage.getItem('progress'));
+            if (progress) {
+                progress.forEach((answer, index) => {
+                    const selectedOption = document.querySelector(`input[name="q${index}"][value="${answer}"]`);
+                    if (selectedOption) {
+                        selectedOption.checked = true;
+                    }
+                });
+            }
+        }
+
+        // Function to render the quiz dynamically
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.innerHTML = ''; // Clear previous content
+
+            questions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.classList.add('question');
+
+                const questionText = document.createElement('h3');
+                questionText.textContent = question.question;
+                questionElement.appendChild(questionText);
+
+                question.options.forEach((option, optionIndex) => {
+                    const optionLabel = document.createElement('label');
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'radio';
+                    optionInput.name = `q${index}`;
+                    optionInput.value = optionIndex;
+                    optionLabel.appendChild(optionInput);
+                    optionLabel.appendChild(document.createTextNode(option));
+                    questionElement.appendChild(optionLabel);
+                });
+
+                quizContainer.appendChild(questionElement);
+            });
+
+            loadQuizProgress(); // Load previously selected answers if they exist
+        }
+
+        // Function to save the user's progress in session storage
+        function saveProgress() {
+            const progress = questions.map((_, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                return selectedOption ? parseInt(selectedOption.value) : null;
+            });
+
+            sessionStorage.setItem('progress', JSON.stringify(progress));
+        }
+
+        // Function to calculate the score
+        function calculateScore() {
+            const progress = JSON.parse(sessionStorage.getItem('progress'));
+            let score = 0;
+
+            if (progress) {
+                progress.forEach((selectedOption, index) => {
+                    if (selectedOption === questions[index].answer) {
+                        score++;
+                    }
+                });
+            }
+
+            return score;
+        }
+
+        // Function to handle quiz submission
+        function handleSubmit() {
+            saveProgress(); // Save progress before submission
+
+            const score = calculateScore(); // Calculate score
+            document.getElementById('scoreContainer').textContent = `Your score is ${score} out of ${questions.length}.`;
+
+            // Store score in local storage
+            localStorage.setItem('score', score);
+        }
+
+        // Function to check if a score exists in local storage and display it
+        function displayStoredScore() {
+            const storedScore = localStorage.getItem('score');
+            if (storedScore !== null) {
+                document.getElementById('scoreContainer').textContent = `Your previous score is ${storedScore} out of ${questions.length}.`;
+            }
+        }
+
+        // Initialize the quiz on page load
+        window.onload = function () {
+            renderQuiz();
+            displayStoredScore(); // Display score from local storage
+            document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+        };
+    </script>
+
 </body>
 </html>
