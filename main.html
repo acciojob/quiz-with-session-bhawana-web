@@ -1,19 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz with Session</title>
-    <style>
-        .question {
-            margin-bottom: 20px;
-        }
-        .question label {
-            display: block;
-        }
-        .score {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question h3 {
+      margin: 0;
+    }
+    .options label {
+      display: block;
+    }
+    .score {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .submit-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+
+  <h1>Quiz</h1>
+  
+  <div id="quiz-container">
+    <!-- Questions will be dynamically generated here -->
+  </div>
+
+  <button class="submit-btn" onclick="submitQuiz()">Submit Quiz</button>
+
+  <div class="score" id="score"></div>
+
+  <script src="quiz.js"></script>
+</body>
+</html>
